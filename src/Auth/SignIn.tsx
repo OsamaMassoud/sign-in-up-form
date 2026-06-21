@@ -381,7 +381,10 @@ function App() {
 
                         <div className="input-container">
                           <div className="input-wrapper">
-                            <img src="/email-icon.svg" alt="" />
+                            <img
+                              src={`${import.meta.env.BASE_URL}email-icon.svg`}
+                              alt=""
+                            />
                             <input
                               type="email"
                               className="form-input with-icon"
@@ -404,7 +407,10 @@ function App() {
 
                           <div className="input-container">
                             <div className="input-wrapper">
-                              <img src="/password-icon.svg" alt="" />
+                              <img
+                                src={`${import.meta.env.BASE_URL}password-icon.svg`}
+                                alt=""
+                              />
 
                               <input
                                 type={showPassword ? "text" : "password"}
@@ -422,7 +428,10 @@ function App() {
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="password-toggle"
                               >
-                                <img src="/eye-icon.svg" alt="" />
+                                <img
+                                  src={`${import.meta.env.BASE_URL}eye-icon.svg`}
+                                  alt=""
+                                />
                               </button>
                             </div>
                           </div>
@@ -510,7 +519,10 @@ function App() {
                     <label className="form-label">Email</label>
                     <div className="input-container">
                       <div className="input-wrapper">
-                        <img src="/email-icon.svg" alt="" className="input-icon" />
+                        <img
+                          src={`${import.meta.env.BASE_URL}email-icon.svg`}
+                          alt=""
+                        />
                         <input 
                           type="email" 
                           placeholder="Enter Your Email" 

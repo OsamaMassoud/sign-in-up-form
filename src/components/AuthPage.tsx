@@ -41,7 +41,10 @@ export default function AuthPage() {
       <div className="left-side">
         {/* Background Image */}
         <div className="background-image">
-          <img src="/background.png" alt="Background" />
+          <img
+            src={`${import.meta.env.BASE_URL}background.png`}
+            alt="Background"
+          />
         </div>
 
         {/* Gradient Overlay */}
@@ -130,7 +133,11 @@ export default function AuthPage() {
                     <label className="form-label">Email</label>
                     <div className="input-container">
                       <div className="input-wrapper">
-                        <img src="/email-icon.svg" alt="" className="input-icon" />
+                        <img
+                          src={`${import.meta.env.BASE_URL}email-icon.svg`}
+                          alt=""
+                          className="input-icon"
+                        />
                         <input
                           type="email"
                           placeholder="you@example.com"
@@ -145,7 +152,10 @@ export default function AuthPage() {
                     <label className="form-label">Password</label>
                     <div className="input-container">
                       <div className="input-wrapper">
-                        <img src="/password-icon.svg" alt="" className="input-icon" />
+                       <img
+                          src={`${import.meta.env.BASE_URL}password-icon.svg`}
+                          className="input-icon"
+                        />
                         <input
                           type={showPassword ? 'text' : 'password'}
                           placeholder="••••••••"
@@ -156,7 +166,7 @@ export default function AuthPage() {
                           onClick={() => setShowPassword((v) => !v)}
                           className="password-toggle"
                         >
-                          <img src="/eye-icon.svg" alt="Toggle password visibility" />
+                          <img src={`${import.meta.env.BASE_URL}eye-icon.svg`} />
                         </button>
                       </div>
                     </div>
