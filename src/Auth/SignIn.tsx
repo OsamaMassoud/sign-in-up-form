@@ -402,42 +402,43 @@ function App() {
                       </div>
 
 
-                    <div className="form-field">
-                          <label className="form-label">Password</label>
+                   <div className="form-field">
+                    <label className="form-label">Password</label>
 
-                          <div className="input-container">
-                            <div className="input-wrapper">
-                              <img
-                                src={`${import.meta.env.BASE_URL}password-icon.svg`}
-                                alt=""
-                              />
+                    <div className="input-container">
+                      <div className="input-wrapper">
+                        <img
+                          src={`${import.meta.env.BASE_URL}password-icon.svg`}
+                          className="input-left-icon" 
+                          alt=""
+                        />
 
-                              <input
-                                type={showPassword ? "text" : "password"}
-                                className="form-input with-icon with-right-icon"
-                                placeholder="Enter Your Password"
-                                value={signInData.password}
-                                onChange={(e) => {
-                                  setSignInData((p) => ({ ...p, password: e.target.value }));
-                                  if (signInErrors.password) setSignInErrors((p) => ({ ...p, password: "" }));
-                                }}
-                              />
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          className="form-input with-icon with-right-icon"
+                          placeholder="Enter Your Password"
+                          value={signInData.password}
+                          onChange={(e) => {
+                            setSignInData((p) => ({ ...p, password: e.target.value }));
+                            if (signInErrors.password) setSignInErrors((p) => ({ ...p, password: "" }));
+                          }}
+                        />
 
-                              <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="password-toggle"
-                              >
-                                <img
-                                  src={`${import.meta.env.BASE_URL}eye-icon.svg`}
-                                  alt=""
-                                />
-                              </button>
-                            </div>
-                          </div>
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="password-toggle"
+                        >
+                          <img
+                            src={`${import.meta.env.BASE_URL}eye-icon.svg`}
+                            alt=""
+                          />
+                        </button>
+                      </div>
+                    </div>
 
-                          {signInErrors.password && <p className="form-error">{signInErrors.password}</p>}
-                        </div>
+                    {signInErrors.password && <p className="form-error">{signInErrors.password}</p>}
+                  </div>
 
 
 
