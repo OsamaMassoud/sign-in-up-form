@@ -179,25 +179,25 @@
 
 .input-container {
   width: 100%;
-  height: 36px;
+  height: 38px; 
   position: relative;
 }
 
-/* [تعديل] الحاوية أصبحت هي الصندوق الرمادي الفعلي المحتوي للأيقونات والنصوص */
+
 .input-wrapper {
   position: relative;
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
-  background: #F3F3F5;
-  border: 0.8px solid rgba(0, 0, 0, 0);
+  background: #EAEAEF;                 
+  border: 1px solid rgba(0, 0, 0, 0.07); 
   border-radius: 8px;
   box-sizing: border-box;
-  transition: border-color 0.2s ease;
+  transition: all 0.2s ease-in-out;    
 }
 
-/* [تعديل] تفريغ حقل النص ليصبح شفافاً ويندمج مع الحاوية */
+
 .form-input {
   width: 100%;
   height: 100%;
@@ -209,32 +209,35 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 1.15em;
-  color: #717182;
+  color: #374151; 
 }
+
 
 .form-select-year {
   width: auto;              
   min-width: 72px;        
   height: 36px;
-  background: #F3F3F5;
+  background: #EAEAEF;
+  border: 1px solid rgba(0, 0, 0, 0.07);
   border-radius: 8px;
+  color: #374151;
 }
 
-/* [تعديل] إعطاء مسافة بادئة من اليسار فقط للحقول التي تحتوي على أيقونة */
 .form-input.with-icon {
-  padding-left: 36px;        
+  padding-left: 38px;        
 }
 
 .form-input::placeholder {
-  color: #717182;
+  color: #8E8E9F; 
 }
 
-/* [تعديل] نقل تأثير التركيز (Focus) ليعمل على إطار الحاوية بالكامل */
+
 .input-wrapper:focus-within {
-  border-color: rgba(0, 0, 0, 0.15);
+  background: #FFFFFF;
+  border-color: #312C85; 
+  box-shadow: 0 0 0 3px rgba(49, 44, 133, 0.08); 
 }
 
-/* [تعديل] سنترة الأيقونة اليسارية بشكل صحيح داخل الصندوق الرمادي */
 .input-icon {
   position: absolute;
   left: 12px;
@@ -244,9 +247,9 @@
   height: 16px;
   z-index: 2;
   pointer-events: none;
+  opacity: 0.8; 
 }
 
-/* [تعديل] سنترة أيقونة العين لـكلمة المرور في أقصى اليمين داخل الصندوق */
 .password-toggle {
   position: absolute;
   right: 12px;
@@ -261,6 +264,11 @@
   align-items: center;
   justify-content: center;
   z-index: 2;
+  opacity: 0.7;
+}
+
+.password-toggle:hover {
+  opacity: 1; 
 }
 
 .password-toggle img {
@@ -281,14 +289,20 @@
   gap: 8px;
 }
 
+
 .checkbox {
   width: 16px;
   height: 16px;
-  border: 0.8px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 4px;
-  background: #F3F3F5;
+  background: #EAEAEF;
   cursor: pointer;
   box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+}
+
+.checkbox:focus {
+  border-color: #312C85;
 }
 
 .checkbox-label {
@@ -383,7 +397,7 @@
 
 /* Date input styling */
 input[type="date"] {
-  color: #717182;
+  color: #374151;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
@@ -420,7 +434,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   justify-content: center;
   padding: 6px 12px;
   border-radius: 999px;
-  background: #F3F3F5;
+  background: #EAEAEF;
   border: 1px solid rgba(0,0,0,0.06);
   margin-bottom: 20px;
 }
@@ -609,16 +623,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .form-input.multi-select-input {
-  height: 36px;              
+  height: 38px;              
   line-height: 28px;          
   padding: 4px 12px;          
   padding-right: 40px;  
-  background: #F3F3F5;           
+  background: #EAEAEF;           
   border-radius: 8px;
-  border: 0.8px solid transparent;
+  border: 1px solid rgba(0, 0, 0, 0.07);
   font-family: 'Arimo', sans-serif;
   font-size: 14px;
-  color: #717182;
+  color: #374151;
   display: flex;
   align-items: center;
   cursor: pointer;
