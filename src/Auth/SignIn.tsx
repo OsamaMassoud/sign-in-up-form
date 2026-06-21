@@ -328,7 +328,7 @@ function App() {
   return (
     <div className="sign-in-container">
       <div className="background-image">
-        <img src="public/background.png" alt="Background" />
+        <img src="./background.png" alt="Background" />
       </div>
 
       <div className="right-side">
@@ -381,7 +381,7 @@ function App() {
 
                         <div className="input-container">
                           <div className="input-wrapper">
-                            <img src="public/email-icon.svg" alt="" className="input-icon" />
+                            <img src="./email-icon.svg" alt="" className="input-icon" />
                             <input
                               type="email"
                               className="form-input with-icon"
