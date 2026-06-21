@@ -9,13 +9,13 @@
 }
 
 .left-side {
-  position: fixed; /* Cover the entire viewport */
+  position: fixed; 
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  z-index: 0; /* Behind everything */
+  z-index: 0; 
 }
 
 /* Background image */
@@ -183,20 +183,18 @@
   position: relative;
 }
 
-
 .input-wrapper {
-  position: relative;
+  position: relative; 
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
-  background: #EAEAEF;                 
+  background: #EAEAEF;                  
   border: 1px solid rgba(0, 0, 0, 0.07); 
   border-radius: 8px;
   box-sizing: border-box;
-  transition: all 0.2s ease-in-out;    
+  transition: all 0.2s ease-in-out;     
 }
-
 
 .form-input {
   width: 100%;
@@ -212,7 +210,6 @@
   color: #374151; 
 }
 
-
 .form-select-year {
   width: auto;              
   min-width: 72px;        
@@ -224,14 +221,15 @@
 }
 
 .form-input.with-icon {
-  padding-left: 38px;        
+  padding-left: 36px;  
+  padding-right: 36px; 
 }
 
 .form-input::placeholder {
   color: #8E8E9F; 
 }
 
-
+/* تأثير Focus */
 .input-wrapper:focus-within {
   background: #FFFFFF;
   border-color: #312C85; 
@@ -240,21 +238,21 @@
 
 .input-icon {
   position: absolute;
-  left: 12px;
+  left: 14px;        
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-50%); 
   width: 16px;
   height: 16px;
-  z-index: 2;
-  pointer-events: none;
-  opacity: 0.8; 
+  z-index: 2;                 
+  pointer-events: none;       
+  opacity: 0.5;               
 }
+
 
 .password-toggle {
   position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+  right: 14px;               
+  transform: translateY(-50%); 
   width: 16px;
   height: 16px;
   border: none;
@@ -264,7 +262,7 @@
   align-items: center;
   justify-content: center;
   z-index: 2;
-  opacity: 0.7;
+  opacity: 0.5;
 }
 
 .password-toggle:hover {
@@ -288,7 +286,6 @@
   align-items: center;
   gap: 8px;
 }
-
 
 .checkbox {
   width: 16px;
@@ -416,7 +413,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 @media (max-width: 768px) {
   .right-side {
-    justify-content: center; /* Center card on small screens */
+    justify-content: center; 
     padding: 24px;
   }
 
