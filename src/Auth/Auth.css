@@ -1,6 +1,4 @@
-/* ==========================================================================
-   إعدادات الصفحة العامة والخلفية
-   ========================================================================== */
+
 .sign-in-container {
   position: relative;
   width: 100vw;
@@ -11,17 +9,18 @@
   align-items: center;
 }
 
+
 .left-side {
-  position: fixed; /* يغطي الشاشة بأكملها */
+  position: fixed; /* Cover the entire viewport */
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  z-index: 0; /* خلف العناصر بالكامل */
+  z-index: 0; /* Behind everything */
 }
 
-/* صورة الخلفية */
+/* Background image */
 .background-image {
   position: absolute;
   inset: 0;
@@ -34,10 +33,12 @@
   object-fit: cover;
 }
 
-/* ==========================================================================
-   الجانب الأيمن (الفورم والكارد)
-   ========================================================================== */
-.right-side {
+
+/* =============================
+   Form Side (Overlay on RIGHT)
+============================= */
+
+.right-side{
   flex: 1;
   background: transparent;
   display: flex;
@@ -46,9 +47,13 @@
   padding: 32px 107.6px;   
   z-index: 10;
   position: relative;
+
+               
 }
 
-/* الحاوية الخارجية للأزرار والكارد */
+
+
+/* Wrapper for tabs + card */
 .form-container {
   width: 100%;
   max-width: 500px;
@@ -58,14 +63,14 @@
   background: transparent;
   transition: max-width 0.3s ease;
 }
-
 .form-container--signup {
   max-width: 600px;  
 }
 
-/* ==========================================================================
-   أزرار التبديل العلوية (Tabs)
-   ========================================================================== */
+/* =============================
+   Tabs
+============================= */
+
 .tab-list {
   width: 100%;
   height: 36px;
@@ -105,9 +110,10 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* ==========================================================================
-   الكارد الرئيسي (Card)
-   ========================================================================== */
+/* =============================
+   Card
+============================= */
+
 .card {
   width: 100%; 
   background: rgba(255, 255, 255, 0.95);
@@ -118,7 +124,10 @@
   transition: max-width 0.3s ease, min-height 0.3s ease;
   position: relative;
   z-index: 11;
+  
 }
+
+
 
 .card-header {
   margin-bottom: 24px;
@@ -148,9 +157,10 @@
   margin: 0;
 }
 
-/* ==========================================================================
-   حقول الإدخال والـ Forms وتعديلات الأيقونات المدمجة
-   ========================================================================== */
+/* =============================
+   Forms
+============================= */
+
 .sign-in-form,
 .sign-up-form {
   display: flex;
@@ -168,13 +178,17 @@
   font-family: 'Arimo', sans-serif;
   font-weight: 400;
   font-size: 14px;
-  line-height: 1.4285714285714286em;
+line-height: 1.4285714285714286em;
   color: #0A0A0A;
 }
 
+
 .form-label--small {
   margin-bottom: 2px;
+
 }
+
+
 
 .input-container {
   width: 100%;
@@ -201,9 +215,29 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 1.15em;
-  color: #0A0A0A; /* تعديل لظهور خط الكتابة بشكل واضح */
+  color: #717182;
   outline: none;
 }
+
+.form-select-year {
+  width: auto;              
+  min-width: 72px;        
+  height: 36px;
+
+  background: #F3F3F5;
+  border-radius: 8px;
+
+}
+
+
+
+
+
+.form-input.with-icon {
+  padding-left: 40px;        
+}
+
+
 
 .form-input::placeholder {
   color: #717182;
@@ -213,18 +247,14 @@
   border-color: rgba(0, 0, 0, 0.1);
 }
 
-/* [تعديل] ضبط أيقونة المدخلات اليسرى (مثل القفل والجواب) لتثبيتها بالتساوي وبشفافية ناعمة */
 .input-icon {
   position: absolute;
   left: 12px;
   width: 16px;
   height: 16px;
-  opacity: 0.45; /* لجعل السُمك يبدو رفيعاً وخفيفاً ومطابقاً للصورة المعروضة */
-  z-index: 2; /* لتظهر دائماً فوق خلفية الـ input الرمادية */
-  pointer-events: none; /* لمنع حجب نقرة الماوس عن الـ input */
+  z-index: 1;
 }
 
-/* [تعديل] ضبط أيقونة العين (Password Toggle) لتتناسق وتتوازن هندسياً */
 .password-toggle {
   position: absolute;
   right: 12px;
@@ -236,38 +266,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2;
-  padding: 0;
+  z-index: 1;
 }
 
-/* [تعديل] تفتيح ونحت صورة العين لتطابق تماماً شفافية القفل الخطية */
 .password-toggle img {
   width: 100%;
   height: 100%;
-  opacity: 0.45; 
 }
 
-/* [تعديل إجباري] التأكد من ترك مساحة كافية من اليمين واليسار حتى لا تتداخل نصوص الكتابة مع الأيقونات */
-.form-input.with-icon {
-  padding-left: 40px !important;
-}
-
-.form-input.with-right-icon {
-  padding-right: 40px !important;
-}
-
-/* باقي الكود المخصص للخيارات الإضافية والسلكت */
-.form-select-year {
-  width: auto;              
-  min-width: 72px;        
-  height: 36px;
-  background: #F3F3F5;
-  border-radius: 8px;
-}
-
-/* ==========================================================================
-   الخيارات السفلية وزر تسجيل الدخول
-   ========================================================================== */
 .form-options {
   display: flex;
   justify-content: space-between;
@@ -296,9 +302,12 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 1.4285714285714286em;
+
   color: #4A5565;
   cursor: pointer;
 }
+
+
 
 .forgot-password {
   font-family: 'Arimo', sans-serif;
@@ -338,9 +347,10 @@
   opacity: 0.8;
 }
 
-/* ==========================================================================
-   تنسيقات الفورم الخاص بـ Sign Up والخطوات
-   ========================================================================== */
+/* =============================
+   Sign Up specifics
+============================= */
+
 .form-row {
   display: flex;
   gap: 16px;
@@ -352,6 +362,7 @@
   flex-direction: column;
   gap: 16px;
 }
+
 
 .form-row .form-field {
   flex: 1;
@@ -380,6 +391,7 @@
   cursor: not-allowed;
 }
 
+/* Date input styling */
 input[type="date"] {
   color: #717182;
 }
@@ -389,14 +401,31 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
 }
 
+/* Ensure proper spacing in sign up form */
 .sign-up-form .form-field:last-of-type {
   margin-top: 0;
 }
 
-/* ==========================================================================
-   المؤشرات (Stepper) وشريط قوة كلمة المرور والأخطاء
-   ========================================================================== */
-.stepper {
+/* =============================
+   Responsive
+============================= */
+
+@media (max-width: 768px) {
+  .right-side {
+    justify-content: center; /* Center card on small screens */
+    padding: 24px;
+  }
+
+  .blur-circle-1,
+  .blur-circle-2 {
+    filter: blur(96px);
+    opacity: 0.7;
+  }
+}
+
+
+/*Indicator*/
+.stepper{
   display: flex;
   align-items: center;
   justify-content: center;
@@ -407,39 +436,41 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   margin-bottom: 20px;
 }
 
-.stepper-item {
+.stepper-item{
   display: flex;
   align-items: center;
 }
 
-.stepper-dot {
+.stepper-dot{
   width: 26px;
   height: 26px;
   border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
+
   font-family: 'Arimo', sans-serif;
   font-size: 12px;
   line-height: 1;
+
   background: #ffffff;
   border: 1px solid rgba(0,0,0,0.10);
   color: #717182;
 }
 
-.stepper-dot.active {
+.stepper-dot.active{
   background: #0A0A0A;
   border-color: #0A0A0A;
   color: #ffffff;
 }
 
-.stepper-dot.done {
+.stepper-dot.done{
   background: rgba(25, 255, 25, 0.6);
   border-color: rgba(10,10,10,0.12);
   color: #ffffff;
 }
 
-.stepper-line {
+.stepper-line{
   width: 26px;
   height: 2px;
   margin: 0 8px;
@@ -447,14 +478,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   background: rgba(10,10,10,0.12);
 }
 
-.stepper-line.filled {
+.stepper-line.filled{
   background: rgba(25, 255, 25, 0.6);
 }
+
+
+/*Passowrd Bar*/
 
 .form-field .input-container {
   margin-bottom: 0;
 }
-
 .password-strength {
   display: flex;
   align-items: center;
@@ -462,6 +495,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   margin-top: 0px;
 }
 
+/* bars */
 .strength-bars {
   display: flex;
   gap: 4px;
@@ -474,18 +508,37 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   background: rgba(0,0,0,0.15);
 }
 
-.password-strength.red .strength-bar.active { background: #ef4444; }
-.password-strength.yellow .strength-bar.active { background: #f59e0b; }
-.password-strength.green .strength-bar.active { background: #22c55e; }
+
+.password-strength.red .strength-bar.active {
+  background: #ef4444; 
+}
+
+.password-strength.yellow .strength-bar.active {
+  background: #f59e0b; 
+}
+
+.password-strength.green .strength-bar.active {
+  background: #22c55e; 
+}
+
 
 .strength-label {
   font-size: 12px;
   font-weight: 500;
 }
 
-.password-strength.red .strength-label { color: #ef4444; }
-.password-strength.yellow .strength-label { color: #f59e0b; }
-.password-strength.green .strength-label { color: #22c55e; }
+.password-strength.red .strength-label {
+  color: #ef4444;
+}
+
+.password-strength.yellow .strength-label {
+  color: #f59e0b;
+}
+
+.password-strength.green .strength-label {
+  color: #22c55e;
+}
+
 
 .password-label {
   display: inline-flex;
@@ -493,12 +546,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   gap: 8px;
 }
 
+/* wrapper */
 .tooltip {
   position: relative;
   display: inline-flex;
   align-items: center;
 }
 
+/* icon */
 .tooltip-icon {
   width: 18px;
   height: 18px;
@@ -512,6 +567,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
 }
 
+/* bubble */
 .tooltip-content {
   position: absolute;
   left: 50%;
@@ -527,18 +583,21 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   line-height: 1.4;
   white-space: normal;
   z-index: 9999;
+
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   transition: opacity 0.15s ease;
 }
 
+/* show on hover/focus */
 .tooltip:hover .tooltip-content,
 .tooltip:focus-within .tooltip-content {
   opacity: 1;
   visibility: visible;
 }
 
+/* little arrow */
 .tooltip-content::before {
   content: "";
   position: absolute;
@@ -550,11 +609,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   border-color: transparent transparent rgba(10, 10, 10, 0.92) transparent;
 }
 
+
 .form-error {
   margin-top: 4px;
   font-size: 12px;
   color: #d92d20;
 }
+
+
 
 .multi-select {
   position: relative;
@@ -565,10 +627,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
+      
+       
+  
 }
 
 .form-input.multi-select-input {
-  height: 36px;              
+  height: 36px;               
   line-height: 28px;          
   padding: 4px 12px;          
   padding-right: 40px;  
@@ -578,16 +643,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   font-family: 'Arimo', sans-serif;
   font-size: 14px;
   color: #717182;
+                 
   display: flex;
   align-items: center;
   cursor: pointer;
 }
+
 
 .multi-select-input .arrow {
   margin-left: auto;
   color: #717182;
   font-size: 12px;
 }
+
+
 
 .multi-select .arrow {
   opacity: 0.6;
@@ -621,14 +690,4 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .checkbox-item:hover {
   background: #f3f3f5;
   border-radius: 6px;
-}
-
-/* ==========================================================================
-   التجاوب مع الشاشات الصغيرة (Responsive)
-   ========================================================================== */
-@media (max-width: 768px) {
-  .right-side {
-    justify-content: center; /* سنترة الكارد في الشاشات الصغيرة */
-    padding: 24px;
-  }
 }

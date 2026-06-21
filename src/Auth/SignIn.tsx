@@ -328,7 +328,7 @@ function App() {
   return (
     <div className="sign-in-container">
       <div className="background-image">
-        <img src={`${import.meta.env.BASE_URL}background.png`} alt="Background" />
+        <img src="/background.png" alt="Background" />
       </div>
 
       <div className="right-side">
@@ -381,10 +381,7 @@ function App() {
 
                         <div className="input-container">
                           <div className="input-wrapper">
-                            <img
-                              src={`${import.meta.env.BASE_URL}email-icon.svg`}
-                              alt=""
-                            />
+                            <img src="/email-icon.svg" alt="" className="input-icon" />
                             <input
                               type="email"
                               className="form-input with-icon"
@@ -402,43 +399,36 @@ function App() {
                       </div>
 
 
-                   <div className="form-field">
-                    <label className="form-label">Password</label>
+                    <div className="form-field">
+                          <label className="form-label">Password</label>
 
-                    <div className="input-container">
-                      <div className="input-wrapper">
-                        <img
-                          src={`${import.meta.env.BASE_URL}password-icon.svg`}
-                          className="input-left-icon" 
-                          alt=""
-                        />
+                          <div className="input-container">
+                            <div className="input-wrapper">
+                              <img src="/password-icon.svg" alt="" className="input-icon" />
 
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          className="form-input with-icon with-right-icon"
-                          placeholder="Enter Your Password"
-                          value={signInData.password}
-                          onChange={(e) => {
-                            setSignInData((p) => ({ ...p, password: e.target.value }));
-                            if (signInErrors.password) setSignInErrors((p) => ({ ...p, password: "" }));
-                          }}
-                        />
+                              <input
+                                type={showPassword ? "text" : "password"}
+                                className="form-input with-icon with-right-icon"
+                                placeholder="Enter Your Password"
+                                value={signInData.password}
+                                onChange={(e) => {
+                                  setSignInData((p) => ({ ...p, password: e.target.value }));
+                                  if (signInErrors.password) setSignInErrors((p) => ({ ...p, password: "" }));
+                                }}
+                              />
 
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="password-toggle"
-                        >
-                          <img
-                            src={`${import.meta.env.BASE_URL}eye-icon.svg`}
-                            alt=""
-                          />
-                        </button>
-                      </div>
-                    </div>
+                              <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="password-toggle"
+                              >
+                                <img src="/eye-icon.svg" alt="" />
+                              </button>
+                            </div>
+                          </div>
 
-                    {signInErrors.password && <p className="form-error">{signInErrors.password}</p>}
-                  </div>
+                          {signInErrors.password && <p className="form-error">{signInErrors.password}</p>}
+                        </div>
 
 
 
@@ -520,10 +510,7 @@ function App() {
                     <label className="form-label">Email</label>
                     <div className="input-container">
                       <div className="input-wrapper">
-                        <img
-                          src={`${import.meta.env.BASE_URL}email-icon.svg`}
-                          alt=""
-                        />
+                        <img src="/email-icon.svg" alt="" className="input-icon" />
                         <input 
                           type="email" 
                           placeholder="Enter Your Email" 
