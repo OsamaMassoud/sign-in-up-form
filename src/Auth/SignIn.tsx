@@ -328,7 +328,7 @@ function App() {
   return (
     <div className="sign-in-container">
       <div className="background-image">
-        <img src="/background.png" alt="Background" />
+        <img src={`${import.meta.env.BASE_URL}background.png`} alt="Background" />
       </div>
 
       <div className="right-side">
@@ -381,7 +381,7 @@ function App() {
 
                         <div className="input-container">
                           <div className="input-wrapper">
-                            <img src="/email-icon.svg" alt="" className="input-icon" />
+                            <img src="/email-icon.svg" alt="" />
                             <input
                               type="email"
                               className="form-input with-icon"
@@ -404,7 +404,7 @@ function App() {
 
                           <div className="input-container">
                             <div className="input-wrapper">
-                              <img src="/password-icon.svg" alt="" className="input-icon" />
+                              <img src="/password-icon.svg" alt="" />
 
                               <input
                                 type={showPassword ? "text" : "password"}
