@@ -1,0 +1,468 @@
+
+.sign-in-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+
+  /* Keep form on the right */
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+
+.left-side {
+  position: fixed; /* Cover the entire viewport */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 0; /* Behind everything */
+}
+
+/* Background image */
+.background-image {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.background-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Gradient overlay */
+.gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(49, 44, 133, 0.9) 0%,
+    rgba(89, 22, 139, 0.85) 50%,
+    rgba(28, 57, 142, 0.9) 100%
+  );
+  z-index: 2;
+}
+
+/* Decorative blur circles */
+.blur-circle {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(128px);
+  z-index: 3;
+}
+
+.blur-circle-1 {
+  width: 384px;
+  height: 384px;
+  background: rgba(97, 95, 255, 0.2);
+  top: 80px;
+  left: 80px;
+}
+
+.blur-circle-2 {
+  width: 320px;
+  height: 320px;
+  background: rgba(173, 70, 255, 0.2);
+  top: 246.4px;
+  right: 80px;
+}
+
+/* Logo centered on background */
+.logo-section {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  z-index: 4;
+}
+
+.logo-container {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(97, 95, 255, 1) 0%, rgba(152, 16, 250, 1) 100%);
+  box-shadow: 0px 25px 50px -12px rgba(97, 95, 255, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-title {
+  font-family: 'Arimo', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5em;
+  text-align: center;
+  color: #FFFFFF;
+  margin: 0;
+  text-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* =============================
+   Form Side (Overlay on RIGHT)
+============================= */
+
+.right-side {
+  flex: 1;
+  background: transparent;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;  
+  padding: 80px 107.6px;     
+  position: relative;
+}
+
+
+/* Wrapper for tabs + card */
+.form-container {
+  width: 100%;
+  max-width: 448px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+
+  /* IMPORTANT: keep it transparent (white should be ONLY on .card) */
+  background: transparent;
+}
+
+/* =============================
+   Tabs
+============================= */
+
+.tab-list {
+  width: 100%;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 14px;
+  display: flex;
+  padding: 3.8px;
+  gap: 0;
+  position: relative;
+}
+
+.tab-button {
+  flex: 1;
+  height: 28.6px;
+  border: none;
+  background: transparent;
+  border-radius: 14px;
+  font-family: 'Arimo', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.4285714285714286em;
+  text-align: center;
+  color: #0A0A0A;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 0.8px solid transparent;
+}
+
+.tab-button.active {
+  background: #FFFFFF;
+  color: #312C85;
+  border-color: rgba(0, 0, 0, 0);
+}
+
+.tab-button:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* =============================
+   Card
+============================= */
+
+.card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  border: 0.8px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  box-shadow: 0px 25px 50px -12px rgba(0, 0, 0, 0.25);
+  padding: 24px;
+
+  /* Safety layering */
+  position: relative;
+  z-index: 11;
+
+  /* Auto height */
+  min-height: auto;
+}
+
+.card-header {
+  margin-bottom: 24px;
+}
+
+.sign-up-form .card-header {
+  margin-bottom: 24px;
+}
+
+.card-title {
+  font-family: 'Arimo', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1em;
+  text-align: center;
+  color: #0A0A0A;
+  margin: 0 0 8px 0;
+}
+
+.card-description {
+  font-family: 'Arimo', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5em;
+  text-align: center;
+  color: #717182;
+  margin: 0;
+}
+
+/* =============================
+   Forms
+============================= */
+
+.sign-in-form,
+.sign-up-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  font-family: 'Arimo', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1em;
+  color: #0A0A0A;
+}
+
+.input-container {
+  width: 100%;
+  height: 36px;
+  position: relative;
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.form-input {
+  width: 100%;
+  height: 100%;
+  padding: 4px 12px 4px 40px;
+  background: #F3F3F5;
+  border: 0.8px solid rgba(0, 0, 0, 0);
+  border-radius: 8px;
+  font-family: 'Arimo', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.14990234375em;
+  color: #717182;
+  outline: none;
+}
+
+.form-input::placeholder {
+  color: #717182;
+}
+
+.form-input:focus {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  z-index: 1;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.password-toggle img {
+  width: 100%;
+  height: 100%;
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  border: 0.8px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  background: #F3F3F5;
+  cursor: pointer;
+  box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+}
+
+.checkbox-label {
+  font-family: 'Arimo', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.4285714285714286em;
+  color: #4A5565;
+  cursor: pointer;
+}
+
+.sign-up-form .checkbox-label {
+  line-height: 1.25em;
+}
+
+.forgot-password {
+  font-family: 'Arimo', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.4285714285714286em;
+  color: #4F39F6;
+  text-decoration: none;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.sign-in-button {
+  width: 100%;
+  height: 36px;
+  background: #030213;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Arimo', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.4285714285714286em;
+  text-align: center;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-top: 8px;
+}
+
+.sign-in-button:hover {
+  opacity: 0.9;
+}
+
+.sign-in-button:active {
+  opacity: 0.8;
+}
+
+/* =============================
+   Sign Up specifics
+============================= */
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.form-row .form-field {
+  flex: 1;
+}
+
+.select-wrapper {
+  position: relative;
+}
+
+.form-select {
+  appearance: none;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+.select-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.form-select:disabled {
+  cursor: not-allowed;
+}
+
+/* Date input styling */
+input[type="date"] {
+  color: #717182;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+/* Ensure proper spacing in sign up form */
+.sign-up-form .form-field:last-of-type {
+  margin-top: 0;
+}
+
+/* =============================
+   Responsive
+============================= */
+
+@media (max-width: 768px) {
+  .right-side {
+    justify-content: center; /* Center card on small screens */
+    padding: 24px;
+  }
+
+  .blur-circle-1,
+  .blur-circle-2 {
+    filter: blur(96px);
+    opacity: 0.7;
+  }
+
+
+}
