@@ -220,7 +220,10 @@ function App() {
                                 useEffect(() => {
                     setLoadingCountries(true);
 
-                    fetch("https://restcountries.com/v5/all?fields=name,cca2")
+                        fetch(
+                          'https://api.restcountries.com/countries/v5?q=canada',
+                          { headers: { 'Authorization': 'Bearer rc_live_2b44f9bf3f224337a1882fe3d4c06df3' } }
+                        )
                       .then((res) => res.json() as Promise<RestCountry[]>)
                       .then((data) => {
                         const names = data
