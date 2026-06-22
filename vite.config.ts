@@ -4,6 +4,6 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/sign-in-up-form/', 
+  base: '/sign-in-up-form', 
   plugins: [react(), tailwindcss()],
 })

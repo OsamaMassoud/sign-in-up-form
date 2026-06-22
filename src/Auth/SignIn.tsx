@@ -220,7 +220,7 @@ function App() {
                                 useEffect(() => {
                     setLoadingCountries(true);
 
-                    fetch("https://restcountries.com/v3.1/all?fields=name,cca2")
+                    fetch("https://restcountries.com/v5/all?fields=name,cca2")
                       .then((res) => res.json() as Promise<RestCountry[]>)
                       .then((data) => {
                         const names = data
@@ -404,7 +404,7 @@ function App() {
 
                           <div className="input-container">
                             <div className="input-wrapper">
-                              <img src="/password-icon.svg" alt="" className="input-icon" />
+                              <img src="./password-icon.svg" alt="" className="input-icon" />
 
                               <input
                                 type={showPassword ? "text" : "password"}
@@ -422,7 +422,7 @@ function App() {
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="password-toggle"
                               >
-                                <img src="/eye-icon.svg" alt="" />
+                                <img src="./eye-icon.svg" alt="" />
                               </button>
                             </div>
                           </div>
@@ -510,7 +510,7 @@ function App() {
                     <label className="form-label">Email</label>
                     <div className="input-container">
                       <div className="input-wrapper">
-                        <img src="/email-icon.svg" alt="" className="input-icon" />
+                        <img src="./email-icon.svg" alt="" className="input-icon" />
                         <input 
                           type="email" 
                           placeholder="Enter Your Email" 
@@ -565,8 +565,8 @@ function App() {
                                 }
                               >
                                 <option value="">Gender</option>
-                                <option value="female">Female</option>
                                 <option value="male">Male</option>
+                                <option value="female">Female</option>
                               </select>
                             </div>
                           </div>
@@ -966,7 +966,7 @@ function App() {
 
                               <div className="input-container">
                                 <div className="input-wrapper">
-                                  <img src="/password-icon.svg" className="input-icon" />
+                                  <img src="./password-icon.svg" className="input-icon" />
 
                                   <input
                                     type={showSignUpPassword ? "text" : "password"}
@@ -983,7 +983,7 @@ function App() {
                                     onClick={() => setShowSignUpPassword((v) => !v)}
                                     className="password-toggle"
                                   >
-                                    <img src="/eye-icon.svg" />
+                                    <img src="./eye-icon.svg" />
                                   </button>
                                 </div>
                               </div>
@@ -1014,7 +1014,7 @@ function App() {
 
                               <div className="input-container">
                                 <div className="input-wrapper">
-                                  <img src="/password-icon.svg" className="input-icon" />
+                                  <img src="./password-icon.svg" className="input-icon" />
 
                                   <input
                                     type={showSignUpConfirmPassword ? "text" : "password"}
@@ -1031,7 +1031,7 @@ function App() {
                                     onClick={() => setShowSignUpConfirmPassword((v) => !v)}
                                     className="password-toggle"
                                   >
-                                    <img src="/eye-icon.svg" />
+                                    <img src="./eye-icon.svg" />
                                   </button>
                                 </div>
                               </div>
