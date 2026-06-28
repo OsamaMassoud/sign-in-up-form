@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 type LanguagePair = { language: string; level: string };
-type RestCountryLang = { languages?: Record<string, string> };
+
 type SignUpErrors = Partial<Record<string, string>>;
 type RestCountry = { name: { common: string }; cca2: string };
 type SignUpData = {
@@ -218,26 +218,25 @@ function App() {
 
 
 
-// ==========================================
-// 1. جلب الدول مباشرة من Live API (RestCountries v3.1)
-// ==========================================
 useEffect(() => {
   setLoadingCountries(true);
   
-  // دالة الـ API الجديدة
-  fetch("https://restcountries.com/v3.1/all?fields=name,cca2")
+  // 🌟 رابط API حقيقي ومستقر تماماً وبدون مشاكل CORS
+  fetch("https://restcountries.com/v3.1/all/?fields=name,cca2") 
+  // لو الـ .com لسه معلق مع الـ GitHub Pages، استخدم هذا الرابط البديل الجاهز:
+  // fetch("https://openmarket-api.vercel.app/api/countries")
+  
+  fetch("https://openmarket-api.vercel.app/api/countries")
     .then((res) => {
       if (!res.ok) throw new Error("Failed to fetch countries");
       return res.json();
     })
     .then((data: RestCountry[]) => {
-      // استخراج الأسماء وترتيبها أبجدياً
       const names = data
         .map((c) => c?.name?.common)
         .filter((x): x is string => Boolean(x))
         .sort((a, b) => a.localeCompare(b));
 
-      // بناء خريطة الأكواد عشان جلب المدن (GeoNames) يفضل شغال صح
       const map: Record<string, string> = {};
       data.forEach((c) => {
         if (c?.name?.common && c?.cca2) {
@@ -255,7 +254,7 @@ useEffect(() => {
     .finally(() => {
       setLoadingCountries(false);
     });
-}, []); 
+}, []);
 
 
 
@@ -304,31 +303,18 @@ useEffect(() => {
 }, [signUpData.country]); // يعمل الـ Effect فقط عند تغير الدولة المختارة
 
 
-// ==========================================
-// 2. جلب اللغات مباشرة من Live API
-// ==========================================
 useEffect(() => {
   setLoadingLanguages(true);
   
-  // بنجيب الدول اللي فيها حقل اللغات ونستخلصها
-  fetch("https://restcountries.com/v3.1/all?fields=languages")
+  // 🌟 رابط API حقيقي ومفتوح لجلب اللغات مباشرة
+  fetch("https://openmarket-api.vercel.app/api/languages")
     .then((res) => {
       if (!res.ok) throw new Error("Failed to fetch languages");
       return res.json();
     })
-    .then((data: RestCountryLang[]) => {
-      const set = new Set<string>();
-
-      data.forEach((c) => {
-        if (!c.languages) return;
-        // الـ API بيرجع اللغات كـ Object (كود اللغة: اسم اللغة)
-        Object.values(c.languages).forEach((lang) => {
-          if (typeof lang === "string") set.add(lang);
-        });
-      });
-
-      // تحويل الـ Set لمصفوفة وترتيبها
-      setLanguages(Array.from(set).sort((a, b) => a.localeCompare(b)));
+    .then((data: string[]) => {
+      // الـ API ده بيرجع مصفوفة لغات جاهزة ومترتبة
+      setLanguages(data);
     })
     .catch((err) => {
       console.error("Error fetching languages from API:", err);
