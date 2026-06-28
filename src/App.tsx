@@ -49,7 +49,7 @@ export default function App() {
   return (
     <Routes>
       {/* open signin first */}
-      <Route path="/" element={<Navigate to="/signin" replace />} />
+      <Route path="/" element={<Navigate to="/sign-in-up-form" replace />} />
 
       {/* auth page */}
       <Route
