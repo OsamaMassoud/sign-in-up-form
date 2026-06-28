@@ -9,7 +9,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 type LanguagePair = { language: string; level: string };
 
 type SignUpErrors = Partial<Record<string, string>>;
-type RestCountry = { name: { common: string }; cca2: string };
+//type RestCountry = { name: { common: string }; cca2: string };
 type SignUpData = {
   firstName: string;
   lastName: string;
@@ -196,7 +196,7 @@ function App() {
           };
 
                 const strength = getPasswordStrength(signUpData.password);
-                const [ , setCountryCodeByName] = useState<Record<string, string>>({});
+                const [ countryCodeByName, setCountryCodeByName] = useState<Record<string, string>>({});
 
 
 
@@ -221,35 +221,36 @@ function App() {
 useEffect(() => {
   setLoadingCountries(true);
   
-  // 🌟 رابط API حقيقي ومستقر تماماً وبدون مشاكل CORS
-  fetch("https://restcountries.com/v3.1/all/?fields=name,cca2") 
-  // لو الـ .com لسه معلق مع الـ GitHub Pages، استخدم هذا الرابط البديل الجاهز:
-  // fetch("https://openmarket-api.vercel.app/api/countries")
-  
-  fetch("https://openmarket-api.vercel.app/api/countries")
+ 
+  fetch("https://secure.geonames.org/countryInfoJSON?username=osama_portfolio")
     .then((res) => {
       if (!res.ok) throw new Error("Failed to fetch countries");
       return res.json();
     })
-    .then((data: RestCountry[]) => {
-      const names = data
-        .map((c) => c?.name?.common)
-        .filter((x): x is string => Boolean(x))
-        .sort((a, b) => a.localeCompare(b));
+    .then((data) => {
+      if (data && Array.isArray(data.geonames)) {
+        // استخراج أسماء الدول وترتيبها أبجدياً
+        const names = data.geonames
+          .map((c: any) => c.countryName)
+          .filter(Boolean)
+          .sort((a: string, b: string) => a.localeCompare(b));
 
-      const map: Record<string, string> = {};
-      data.forEach((c) => {
-        if (c?.name?.common && c?.cca2) {
-          map[c.name.common] = c.cca2;
-        }
-      });
+        // بناء الـ Map لربط اسم الدولة بالكود بتاعها (مثال: Egypt -> EG)
+        const map: Record<string, string> = {};
+        data.geonames.forEach((c: any) => {
+          if (c.countryName && c.countryCode) {
+            map[c.countryName] = c.countryCode;
+          }
+        });
 
-      setCountries(names);
-      setCountryCodeByName(map);
+        setCountries(names);
+        setCountryCodeByName(map);
+      }
     })
     .catch((err) => {
-      console.error("Error fetching countries from API:", err);
-      setCountries([]);
+      console.error("GeoNames Countries Error:", err);
+      // Fallback ذكي عشان الاستمارة متعطلش لو السيرفر اتأخر
+      setCountries(["Egypt", "Saudi Arabia", "United Arab Emirates", "United States"]);
     })
     .finally(() => {
       setLoadingCountries(false);
@@ -257,12 +258,8 @@ useEffect(() => {
 }, []);
 
 
-
-// ==========================================
-// 3. جلب المدن حياً بناءً على الدولة المختارة
-// ==========================================
 useEffect(() => {
-  // 1. إذا لم يقم المستخدم باختيار دولة، نفرغ مصفوفة المدن تماماً
+  // إذا لم يختار المستخدم دولة، نفرغ قائمة المدن
   if (!signUpData.country) {
     setCities([]);
     return;
@@ -270,61 +267,83 @@ useEffect(() => {
 
   setLoadingCities(true);
 
-  // 2. استدعاء API جلب المدن بناءً على اسم الدولة المختارة
-  fetch("https://countriesnow.space/api/v0.1/countries/cities", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      country: signUpData.country, // يرسل اسم الدولة مثلاً "Egypt"
-    }),
-  })
+  // جلب كود الدولة المختارة من الـ Map (مثلاً: EG بناءً على Egypt)
+  const targetCode = countryCodeByName[signUpData.country] || "";
+
+  // استدعاء المدن التابعة للكود ده (بحد أقصى 150 مدينة كبار ومترتبين حسب عدد السكان)
+  fetch(`https://secure.geonames.org/searchJSON?country=${targetCode}&featureClass=P&maxRows=150&username=osama_portfolio`)
     .then((res) => {
       if (!res.ok) throw new Error("Failed to fetch cities");
       return res.json();
     })
-    .then((body) => {
-      // الـ API يعيد المدن في مصفوفة داخل body.data
-      if (body && Array.isArray(body.data)) {
-        // ترتيب المدن أبجدياً وحفظها
-        setCities(body.data.sort((a: string, b: string) => a.localeCompare(b)));
+    .then((data: any) => { // استخدام any هنا لاستقبال البيانات القادمة من السيرفر بشكل مرن
+      if (data && Array.isArray(data.geonames)) {
+        // 🌟 استخراج أسماء المدن وتحويلها صراحة إلى نصوص (string) لمنع الـ unknown
+        const cityNames: string[] = data.geonames
+          .map((c: any) => String(c.name))
+          .filter(Boolean);
+        
+        // 🌟 تحديد نوع الـ مصفوفة والـ Set صراحة كـ string[]
+        const uniqueCities: string[] = Array.from(new Set(cityNames))
+          .sort((a: string, b: string) => a.localeCompare(b));
+          
+        setCities(uniqueCities);
       } else {
         setCities([]);
       }
     })
     .catch((err) => {
-      console.error("Error fetching cities from API:", err);
-      setCities([]);
+      console.error("GeoNames Cities Error:", err);
+      // Fallback محلي سريع حسب الدولة لو السيرفر الخارجي واجه مشكلة
+      const localMap: Record<string, string[]> = {
+        "Egypt": ["Cairo", "Alexandria", "Giza", "Mansoura"],
+        "Saudi Arabia": ["Riyadh", "Jeddah", "Mecca", "Medina"],
+        "United Arab Emirates": ["Dubai", "Abu Dhabi", "Sharjah"],
+        "United States": ["New York", "Los Angeles", "Chicago"],
+      };
+      setCities(localMap[signUpData.country] || ["City 1", "City 2"]);
     })
     .finally(() => {
       setLoadingCities(false);
     });
-}, [signUpData.country]); // يعمل الـ Effect فقط عند تغير الدولة المختارة
+}, [signUpData.country, countryCodeByName]); // يشتغل لما الدولة تتغير أو الـ Map تجهز
 
 
+
+// ==========================================
+// 2. جلب اللغات حياً من CDN مستقر للـ CV
+// ==========================================
 useEffect(() => {
   setLoadingLanguages(true);
   
-  // 🌟 رابط API حقيقي ومفتوح لجلب اللغات مباشرة
-  fetch("https://openmarket-api.vercel.app/api/languages")
+  // استخدام رابط CDN حقيقي ومفتوح يحتوي على لغات العالم الرسمية (يدعم CORS بالكامل)
+  fetch("https://unpkg.com/language-list-json@1.0.1/data/languages.json")
     .then((res) => {
       if (!res.ok) throw new Error("Failed to fetch languages");
       return res.json();
     })
-    .then((data: string[]) => {
-      // الـ API ده بيرجع مصفوفة لغات جاهزة ومترتبة
-      setLanguages(data);
+    .then((data) => {
+      // الـ CDN يعيد كائن (Object) حيث المفاتيح هي أكواد اللغات والقيم هي الأسماء
+      if (data && typeof data === "object") {
+        const languageNames = Object.values(data)
+          .map((lang: any) => lang.name || lang) // استخراج اسم اللغة
+          .filter(Boolean)
+          .sort((a: string, b: string) => a.localeCompare(b)); // ترتيب أبجدي
+
+        setLanguages(languageNames);
+      } else {
+        throw new Error("Invalid languages data format");
+      }
     })
     .catch((err) => {
-      console.error("Error fetching languages from API:", err);
-      setLanguages([]);
+      console.error("Languages Fetch Error:", err);
+      // Fallback (خطة بديلة) سريعة وممتازة لضمان عدم توقف الواجهة لو حدث أي طارئ في الشبكة
+      setLanguages(["Arabic", "English", "French", "German", "Spanish", "Italian", "Chinese", "Russian"]);
     })
     .finally(() => {
       setLoadingLanguages(false);
     });
 }, []);
-
                         useEffect(() => {
                           if (activeTab === "signin") {
                             setSignUpStep(1);
