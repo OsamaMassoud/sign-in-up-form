@@ -308,7 +308,7 @@ useEffect(() => {
 
   setLoadingLanguages(true);
 
-  // محاكاة loading بسيط عشان الـ UX
+ 
   setTimeout(() => {
     setLanguages(languages.sort((a, b) => a.localeCompare(b)));
     setLoadingLanguages(false);
@@ -321,7 +321,7 @@ useEffect(() => {
   return (
     <div className="sign-in-container">
       <div className="background-image">
-        <img src="/background.png" alt="Background" />
+        <img src="./background.png" alt="Background" />
       </div>
 
       <div className="right-side">
@@ -374,7 +374,7 @@ useEffect(() => {
 
                         <div className="input-container">
                           <div className="input-wrapper">
-                            <img src="/email-icon.svg" alt="" className="input-icon" />
+                            <img src="./email-icon.svg" alt="" className="input-icon" />
                             <input
                               type="email"
                               className="form-input with-icon"
@@ -397,7 +397,7 @@ useEffect(() => {
 
                           <div className="input-container">
                             <div className="input-wrapper">
-                              <img src="/password-icon.svg" alt="" className="input-icon" />
+                              <img src="./password-icon.svg" alt="" className="input-icon" />
 
                               <input
                                 type={showPassword ? "text" : "password"}
@@ -415,7 +415,7 @@ useEffect(() => {
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="password-toggle"
                               >
-                                <img src="/eye-icon.svg" alt="" />
+                                <img src="./eye-icon.svg" alt="" />
                               </button>
                             </div>
                           </div>
@@ -503,7 +503,7 @@ useEffect(() => {
                     <label className="form-label">Email</label>
                     <div className="input-container">
                       <div className="input-wrapper">
-                        <img src="/email-icon.svg" alt="" className="input-icon" />
+                        <img src="./email-icon.svg" alt="" className="input-icon" />
                         <input 
                           type="email" 
                           placeholder="Enter Your Email" 
@@ -959,7 +959,7 @@ useEffect(() => {
 
                               <div className="input-container">
                                 <div className="input-wrapper">
-                                  <img src="/password-icon.svg" className="input-icon" />
+                                  <img src="./password-icon.svg" className="input-icon" />
 
                                   <input
                                     type={showSignUpPassword ? "text" : "password"}
@@ -976,7 +976,7 @@ useEffect(() => {
                                     onClick={() => setShowSignUpPassword((v) => !v)}
                                     className="password-toggle"
                                   >
-                                    <img src="/eye-icon.svg" />
+                                    <img src="./eye-icon.svg" />
                                   </button>
                                 </div>
                               </div>
@@ -1007,7 +1007,7 @@ useEffect(() => {
 
                               <div className="input-container">
                                 <div className="input-wrapper">
-                                  <img src="/password-icon.svg" className="input-icon" />
+                                  <img src="./password-icon.svg" className="input-icon" />
 
                                   <input
                                     type={showSignUpConfirmPassword ? "text" : "password"}
@@ -1024,7 +1024,7 @@ useEffect(() => {
                                     onClick={() => setShowSignUpConfirmPassword((v) => !v)}
                                     className="password-toggle"
                                   >
-                                    <img src="/eye-icon.svg" />
+                                    <img src="./eye-icon.svg" />
                                   </button>
                                 </div>
                               </div>
