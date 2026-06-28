@@ -222,7 +222,7 @@ useEffect(() => {
   setLoadingCountries(true);
   
  
-  fetch("https://secure.geonames.org/countryInfoJSON?username=osama_portfolio")
+  fetch("https://secure.geonames.org/countryInfoJSON?username=osamamassoud")
     .then((res) => {
       if (!res.ok) throw new Error("Failed to fetch countries");
       return res.json();
@@ -271,7 +271,7 @@ useEffect(() => {
   const targetCode = countryCodeByName[signUpData.country] || "";
 
   // استدعاء المدن التابعة للكود ده (بحد أقصى 150 مدينة كبار ومترتبين حسب عدد السكان)
-  fetch(`https://secure.geonames.org/searchJSON?country=${targetCode}&featureClass=P&maxRows=150&username=osama_portfolio`)
+  fetch(`https://secure.geonames.org/searchJSON?country=${targetCode}&featureClass=P&maxRows=150&username=osamamassoud`)
     .then((res) => {
       if (!res.ok) throw new Error("Failed to fetch cities");
       return res.json();
@@ -310,35 +310,35 @@ useEffect(() => {
 
 
 
-// ==========================================
-// 2. جلب اللغات حياً من CDN مستقر للـ CV
-// ==========================================
 useEffect(() => {
   setLoadingLanguages(true);
   
-  // استخدام رابط CDN حقيقي ومفتوح يحتوي على لغات العالم الرسمية (يدعم CORS بالكامل)
-  fetch("https://unpkg.com/language-list-json@1.0.1/data/languages.json")
+  // 🌟 رابط مباشر ومستقر 100% من مستودع GitHub Raw للغات العالم بصيغة مصفوفة واضحة
+  fetch("https://raw.githubusercontent.com/datasets/language-codes/master/data/language-codes-3letter.json")
     .then((res) => {
       if (!res.ok) throw new Error("Failed to fetch languages");
       return res.json();
     })
-    .then((data) => {
-      // الـ CDN يعيد كائن (Object) حيث المفاتيح هي أكواد اللغات والقيم هي الأسماء
-      if (data && typeof data === "object") {
-        const languageNames = Object.values(data)
-          .map((lang: any) => lang.name || lang) // استخراج اسم اللغة
+    .then((data: any[]) => {
+      if (Array.isArray(data)) {
+        // الـ JSON ده يحتوي على مصفوفة كائنات بداخلها حقل English اسم اللغة
+        const languageNames = data
+          .map((item) => item.English)
           .filter(Boolean)
-          .sort((a: string, b: string) => a.localeCompare(b)); // ترتيب أبجدي
+          // تنظيف الأسماء لو جينالك نصوص مركبة مثل "Arabic; Maltese" واختيار الاسم الأول
+          .map((name) => String(name).split(";")[0].trim())
+          .sort((a, b) => a.localeCompare(b));
 
-        setLanguages(languageNames);
+        // إزالة أي تكرار وتحديث الـ State
+        setLanguages(Array.from(new Set(languageNames)));
       } else {
-        throw new Error("Invalid languages data format");
+        throw new Error("Invalid format");
       }
     })
     .catch((err) => {
       console.error("Languages Fetch Error:", err);
-      // Fallback (خطة بديلة) سريعة وممتازة لضمان عدم توقف الواجهة لو حدث أي طارئ في الشبكة
-      setLanguages(["Arabic", "English", "French", "German", "Spanish", "Italian", "Chinese", "Russian"]);
+      // Fallback (خطة بديلة آمنة) عشان الفورم تفضل شغالة لو النت فصل تماماً
+      setLanguages(["Arabic", "English", "French", "German", "Spanish", "Italian", "Japanese", "Chinese"]);
     })
     .finally(() => {
       setLoadingLanguages(false);
@@ -1071,7 +1071,7 @@ useEffect(() => {
 
                               <div className="input-container">
                                 <div className="input-wrapper">
-                                  <img src="/password-icon.svg" className="input-icon" />
+                                  <img src="./password-icon.svg" className="input-icon" />
 
                                   <input
                                     type={showSignUpPassword ? "text" : "password"}
@@ -1088,7 +1088,7 @@ useEffect(() => {
                                     onClick={() => setShowSignUpPassword((v) => !v)}
                                     className="password-toggle"
                                   >
-                                    <img src="/eye-icon.svg" />
+                                    <img src="./eye-icon.svg" />
                                   </button>
                                 </div>
                               </div>
@@ -1119,7 +1119,7 @@ useEffect(() => {
 
                               <div className="input-container">
                                 <div className="input-wrapper">
-                                  <img src="/password-icon.svg" className="input-icon" />
+                                  <img src="./password-icon.svg" className="input-icon" />
 
                                   <input
                                     type={showSignUpConfirmPassword ? "text" : "password"}
@@ -1136,7 +1136,7 @@ useEffect(() => {
                                     onClick={() => setShowSignUpConfirmPassword((v) => !v)}
                                     className="password-toggle"
                                   >
-                                    <img src="/eye-icon.svg" />
+                                    <img src="./eye-icon.svg" />
                                   </button>
                                 </div>
                               </div>
