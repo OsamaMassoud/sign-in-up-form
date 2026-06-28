@@ -3,13 +3,9 @@ import "./Auth.css";
 import StepIndicator from "../components/StepIndicator";
 import { useNavigate } from "react-router-dom";
 
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-
 type LanguagePair = { language: string; level: string };
 
 type SignUpErrors = Partial<Record<string, string>>;
-//type RestCountry = { name: { common: string }; cca2: string };
 type SignUpData = {
   firstName: string;
   lastName: string;
@@ -43,6 +39,8 @@ const initialSignUpData: SignUpData = {
   nativeLanguage: "",
 
   languagePairs: [
+    { language: "", level: "" },
+    { language: "", level: "" },
     { language: "", level: "" },
   ],
 
@@ -79,9 +77,6 @@ function App() {
   const [signUpCompleted, setSignUpCompleted] = useState(false);
   const [showLangDropdown, setShowLangDropdown] = useState(false);
   const [signUpData, setSignUpData] = useState<SignUpData>(initialSignUpData);
-  const [signUpLoading, setSignUpLoading] = useState(false);
-  const [signInLoading, setSignInLoading] = useState(false);
-  const [authError, setAuthError] = useState("");
 
 
 
@@ -143,9 +138,10 @@ function App() {
 
               if (!signUpData.nativeLanguage) e.nativeLanguage = "Native language is required";
 
-              // Only validate language pairs that have a language selected (level is required if language chosen)
+              
               signUpData.languagePairs.forEach((p, idx) => {
-                if (p.language && !p.level) e[`languagePairs.${idx}.level`] = `Please select a level`;
+                if (!p.language) e[`languagePairs.${idx}.language`] = `Language ${idx + 1} is required`;
+                if (!p.level) e[`languagePairs.${idx}.level`] = `Level ${idx + 1} is required`;
               });
 
               if (!signUpData.system) e.system = "System is required";
@@ -196,7 +192,7 @@ function App() {
           };
 
                 const strength = getPasswordStrength(signUpData.password);
-                const [ countryCodeByName, setCountryCodeByName] = useState<Record<string, string>>({});
+                const [countryCodeByName, setCountryCodeByName] = useState<Record<string, string>>({});
 
 
 
@@ -218,137 +214,114 @@ function App() {
 
 
 
+
 useEffect(() => {
-  setLoadingCountries(true);
-  
- 
-  fetch("https://secure.geonames.org/countryInfoJSON?username=osamamassoud")
-    .then((res) => {
-      if (!res.ok) throw new Error("Failed to fetch countries");
-      return res.json();
-    })
-    .then((data) => {
-      if (data && Array.isArray(data.geonames)) {
-        // استخراج أسماء الدول وترتيبها أبجدياً
-        const names = data.geonames
-          .map((c: any) => c.countryName)
-          .filter(Boolean)
-          .sort((a: string, b: string) => a.localeCompare(b));
+  const fetchCountries = async () => {
+    try {
+      setLoadingCountries(true);
 
-        // بناء الـ Map لربط اسم الدولة بالكود بتاعها (مثال: Egypt -> EG)
-        const map: Record<string, string> = {};
-        data.geonames.forEach((c: any) => {
-          if (c.countryName && c.countryCode) {
-            map[c.countryName] = c.countryCode;
-          }
-        });
+      const username = import.meta.env.VITE_GEONAMES_USERNAME;
 
-        setCountries(names);
-        setCountryCodeByName(map);
-      }
-    })
-    .catch((err) => {
-      console.error("GeoNames Countries Error:", err);
-      // Fallback ذكي عشان الاستمارة متعطلش لو السيرفر اتأخر
-      setCountries(["Egypt", "Saudi Arabia", "United Arab Emirates", "United States"]);
-    })
-    .finally(() => {
+      const res = await fetch(
+        `https://secure.geonames.org/countryInfoJSON?username=${username}`
+      );
+
+      const data = await res.json();
+
+      const countries = data.geonames.map((c: any) => c.countryName);
+      const map: Record<string, string> = {};
+
+      data.geonames.forEach((c: any) => {
+        map[c.countryName] = c.countryCode; // ISO2
+      });
+
+      setCountries(countries);
+      setCountryCodeByName(map);
+    } catch (err) {
+      setCountries([]);
+      setCountryCodeByName({});
+    } finally {
       setLoadingCountries(false);
-    });
+    }
+  };
+
+  fetchCountries();
 }, []);
 
 
 useEffect(() => {
-  // إذا لم يختار المستخدم دولة، نفرغ قائمة المدن
-  if (!signUpData.country) {
-    setCities([]);
-    return;
-  }
+  if (!signUpData.country) return;
 
-  setLoadingCities(true);
+  const iso2 = countryCodeByName[signUpData.country];
+  const username = import.meta.env.VITE_GEONAMES_USERNAME;
 
-  // جلب كود الدولة المختارة من الـ Map (مثلاً: EG بناءً على Egypt)
-  const targetCode = countryCodeByName[signUpData.country] || "";
+  if (!iso2 || !username) return;
 
-  // استدعاء المدن التابعة للكود ده (بحد أقصى 150 مدينة كبار ومترتبين حسب عدد السكان)
-  fetch(`https://secure.geonames.org/searchJSON?country=${targetCode}&featureClass=P&maxRows=150&username=osamamassoud`)
-    .then((res) => {
-      if (!res.ok) throw new Error("Failed to fetch cities");
-      return res.json();
-    })
-    .then((data: any) => { // استخدام any هنا لاستقبال البيانات القادمة من السيرفر بشكل مرن
-      if (data && Array.isArray(data.geonames)) {
-        // 🌟 استخراج أسماء المدن وتحويلها صراحة إلى نصوص (string) لمنع الـ unknown
-        const cityNames: string[] = data.geonames
-          .map((c: any) => String(c.name))
-          .filter(Boolean);
-        
-        // 🌟 تحديد نوع الـ مصفوفة والـ Set صراحة كـ string[]
-        const uniqueCities: string[] = Array.from(new Set(cityNames))
-          .sort((a: string, b: string) => a.localeCompare(b));
-          
-        setCities(uniqueCities);
-      } else {
-        setCities([]);
-      }
-    })
-    .catch((err) => {
-      console.error("GeoNames Cities Error:", err);
-      // Fallback محلي سريع حسب الدولة لو السيرفر الخارجي واجه مشكلة
-      const localMap: Record<string, string[]> = {
-        "Egypt": ["Cairo", "Alexandria", "Giza", "Mansoura"],
-        "Saudi Arabia": ["Riyadh", "Jeddah", "Mecca", "Medina"],
-        "United Arab Emirates": ["Dubai", "Abu Dhabi", "Sharjah"],
-        "United States": ["New York", "Los Angeles", "Chicago"],
-      };
-      setCities(localMap[signUpData.country] || ["City 1", "City 2"]);
-    })
-    .finally(() => {
+  const fetchCities = async () => {
+    try {
+      setLoadingCities(true);
+      setSignUpData(prev => ({ ...prev, city: "" }));
+
+      const url = `https://secure.geonames.org/searchJSON?country=${iso2}&featureClass=P&maxRows=30&orderby=name&username=${username}`;
+
+      const res = await fetch(url);
+      const data = await res.json();
+
+      const cities = (data.geonames ?? []).map((c: any) => c.name);
+
+      setCities(cities);
+    } catch {
+      setCities([]);
+    } finally {
       setLoadingCities(false);
-    });
-}, [signUpData.country, countryCodeByName]); // يشتغل لما الدولة تتغير أو الـ Map تجهز
+    }
+  };
+
+  fetchCities();
+}, [signUpData.country]);
 
 
-useEffect(() => {
-  setLoadingLanguages(true);
-
-  // 🌟 قائمة بأشهر لغات العالم وأكثرها استخداماً في الـ Dataset Collection
-  const worldLanguages = [
-    "Arabic (العربية)",
+                          
+                       useEffect(() => {
+  const languages = [
+    "Arabic",
     "English",
-    "Spanish (Español)",
-    "French (Français)",
-    "German (Deutsch)",
-    "Mandarin Chinese (中文)",
-    "Hindi (हिन्दी)",
-    "Portuguese (Português)",
-    "Russian (Русский)",
-    "Japanese (日本語)",
-    "Turkish (Türkçe)",
-    "Korean (한국어)",
-    "Italian (Italiano)",
-    "Dutch (Nederlands)",
-    "Persian (فارسي)"
+    "French",
+    "Spanish",
+    "German",
+    "Italian",
+    "Portuguese",
+    "Russian",
+    "Chinese",
+    "Japanese",
+    "Korean",
+    "Turkish",
+    "Dutch",
+    "Hindi",
+    "Urdu",
+    "Persian",
+    "Swahili",
+    "Greek",
+    "Polish",
+    "Swedish"
   ];
 
-  // ترتيب اللغات أبجدياً تلقائياً وتحديث الـ State في أقل من ميلي ثانية
-  setLanguages(worldLanguages.sort((a, b) => a.localeCompare(b)));
-  setLoadingLanguages(false);
-}, []);
-                        useEffect(() => {
-                          if (activeTab === "signin") {
-                            setSignUpStep(1);
-                            setSignUpCompleted(false);
-                          }
-                        }, [activeTab]);
+  setLoadingLanguages(true);
 
+  // محاكاة loading بسيط عشان الـ UX
+  setTimeout(() => {
+    setLanguages(languages.sort((a, b) => a.localeCompare(b)));
+    setLoadingLanguages(false);
+  }, 300);
+}, []);
+ 
 
                         
 
   return (
     <div className="sign-in-container">
       <div className="background-image">
-        <img src="./background.png" alt="Background" />
+        <img src="/background.png" alt="Background" />
       </div>
 
       <div className="right-side">
@@ -358,13 +331,13 @@ useEffect(() => {
           <div className="tab-list">
             <button
               className={`tab-button ${activeTab === 'signin' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('signin'); setAuthError(""); }}
+              onClick={() => setActiveTab('signin')}
             >
               Sign In
             </button>
             <button
               className={`tab-button ${activeTab === 'signup' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('signup'); setAuthError(""); }}
+              onClick={() => setActiveTab('signup')}
             >
               Sign Up
             </button>
@@ -384,33 +357,15 @@ useEffect(() => {
                 
                 <form
                     className="sign-in-form"
-                    onSubmit={async (e) => {
+                    onSubmit={(e) => {
                       e.preventDefault();
-                      setAuthError("");
 
                       const errs = validateSignIn();
                       setSignInErrors(errs);
+
                       if (Object.keys(errs).length > 0) return;
 
-                      setSignInLoading(true);
-                      try {
-                        const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({
-                            email: signInData.email,
-                            password: signInData.password,
-                          }),
-                        });
-                        const data = await res.json();
-                        if (!res.ok) throw new Error(data.detail || "Login failed");
-
-                       
-                      } catch (err: unknown) {
-                        setAuthError(err instanceof Error ? err.message : "Login failed");
-                      } finally {
-                        setSignInLoading(false);
-                      }
+                      navigate("/projects", { replace: true });
                     }}
                   >
 
@@ -419,7 +374,7 @@ useEffect(() => {
 
                         <div className="input-container">
                           <div className="input-wrapper">
-                            <img src="./email-icon.svg" alt="" className="input-icon" />
+                            <img src="/email-icon.svg" alt="" className="input-icon" />
                             <input
                               type="email"
                               className="form-input with-icon"
@@ -442,7 +397,7 @@ useEffect(() => {
 
                           <div className="input-container">
                             <div className="input-wrapper">
-                              <img src="./password-icon.svg" alt="" className="input-icon" />
+                              <img src="/password-icon.svg" alt="" className="input-icon" />
 
                               <input
                                 type={showPassword ? "text" : "password"}
@@ -460,7 +415,7 @@ useEffect(() => {
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="password-toggle"
                               >
-                                <img src="./eye-icon.svg" alt="" />
+                                <img src="/eye-icon.svg" alt="" />
                               </button>
                             </div>
                           </div>
@@ -479,15 +434,11 @@ useEffect(() => {
                       />
                       <label>Remember me</label>
                     </div>
-                    <a href="/forgot-password" style={{ color: "#4F39F6", textDecoration: "none" }}>Forgot password?</a>
+                    <a href="#">Forgot password?</a>
                   </div>
 
-                  {authError && activeTab === "signin" && (
-                    <p className="form-error" style={{ textAlign: "center" }}>{authError}</p>
-                  )}
-
-                  <button type="submit" className="sign-in-button" disabled={signInLoading} style={{ opacity: signInLoading ? 0.7 : 1 }}>
-                    {signInLoading ? "Signing in..." : "Sign In"}
+                  <button type="submit" className="sign-in-button">
+                    Sign In
                   </button>
                 </form>
               </>
@@ -552,7 +503,7 @@ useEffect(() => {
                     <label className="form-label">Email</label>
                     <div className="input-container">
                       <div className="input-wrapper">
-                        <img src="./email-icon.svg" alt="" className="input-icon" />
+                        <img src="/email-icon.svg" alt="" className="input-icon" />
                         <input 
                           type="email" 
                           placeholder="Enter Your Email" 
@@ -824,15 +775,13 @@ useEffect(() => {
 
                            
                          {showLangDropdown && (
-                            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                              <label className="form-label" style={{ marginBottom: 0 }}>
-                                Other Languages <span style={{ color: "#999", fontWeight: 400, fontSize: "0.85em" }}>(optional)</span>
-                              </label>
+                            <>
+                              {/* Languages */}
+                              <div className="form-row three-cols">
+                                {signUpData.languagePairs.map((pair, idx) => (
+                                  <div className="form-field" key={`lang-${idx}`}>
+                                    <label className="form-label">{`Language ${idx + 1}`}</label>
 
-                              {signUpData.languagePairs.map((pair, idx) => (
-                                <div key={`lang-row-${idx}`} style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
-                                  {/* Language select */}
-                                  <div style={{ flex: 2 }}>
                                     <div className="input-container">
                                       <div className="input-wrapper select-wrapper">
                                         <select
@@ -841,25 +790,36 @@ useEffect(() => {
                                           onChange={(e) => updatePair(idx, "language", e.target.value)}
                                         >
                                           <option value="">Select language</option>
+
                                           {languages
                                             .filter((l) => l !== signUpData.nativeLanguage)
                                             .filter((l) => !usedLanguages.includes(l) || l === pair.language)
                                             .map((lang) => (
-                                              <option key={lang} value={lang}>{lang}</option>
+                                              <option key={lang} value={lang}>
+                                                {lang}
+                                              </option>
                                             ))}
                                         </select>
+
                                         <svg className="select-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
                                           <path d="M4 6L8 10L12 6" stroke="#717182" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
                                       </div>
                                     </div>
+
                                     {errors[`languagePairs.${idx}.language`] && (
                                       <p className="form-error">{errors[`languagePairs.${idx}.language`]}</p>
                                     )}
                                   </div>
+                                ))}
+                              </div>
 
-                                  {/* Level select */}
-                                  <div style={{ flex: 1 }}>
+                              {/* Levels */}
+                              <div className="form-row three-cols">
+                                {signUpData.languagePairs.map((pair, idx) => (
+                                  <div className="form-field" key={`level-${idx}`}>
+                                    <label className="form-label">{`Level ${idx + 1}`}</label>
+
                                     <div className="input-container">
                                       <div className="input-wrapper select-wrapper">
                                         <select
@@ -867,94 +827,31 @@ useEffect(() => {
                                           value={pair.level}
                                           disabled={!pair.language}
                                           onChange={(e) => updatePair(idx, "level", e.target.value)}
-                                          style={{ opacity: pair.language ? 1 : 0.5 }}
                                         >
-                                          <option value="">{pair.language ? "Level" : "—"}</option>
+                                          <option value="">
+                                            {pair.language ? "Select level" : "Select language first"}
+                                          </option>
+
                                           {levels.map((lv) => (
-                                            <option key={lv} value={lv}>{lv}</option>
+                                            <option key={lv} value={lv}>
+                                              {lv}
+                                            </option>
                                           ))}
                                         </select>
+
                                         <svg className="select-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
                                           <path d="M4 6L8 10L12 6" stroke="#717182" strokeWidth="1.33" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
                                       </div>
                                     </div>
+
                                     {errors[`languagePairs.${idx}.level`] && (
                                       <p className="form-error">{errors[`languagePairs.${idx}.level`]}</p>
                                     )}
                                   </div>
-
-                                  {/* Remove button (only if more than 1 row) */}
-                                  {signUpData.languagePairs.length > 1 && (
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        setSignUpData((prev) => ({
-                                          ...prev,
-                                          languagePairs: prev.languagePairs.filter((_, i) => i !== idx),
-                                        }));
-                                      }}
-                                      style={{
-                                        background: "none",
-                                        border: "1px solid #e0e0e0",
-                                        borderRadius: "8px",
-                                        cursor: "pointer",
-                                        padding: "10px",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        color: "#999",
-                                        fontSize: "18px",
-                                        lineHeight: 1,
-                                        flexShrink: 0,
-                                        height: "42px",
-                                        width: "42px",
-                                      }}
-                                      title="Remove language"
-                                    >
-                                      ✕
-                                    </button>
-                                  )}
-                                </div>
-                              ))}
-
-                              {/* Add language button */}
-                              {signUpData.languagePairs.length < 5 && (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setSignUpData((prev) => ({
-                                      ...prev,
-                                      languagePairs: [...prev.languagePairs, { language: "", level: "" }],
-                                    }));
-                                  }}
-                                  style={{
-                                    background: "none",
-                                    border: "1px dashed #c0c0c0",
-                                    borderRadius: "8px",
-                                    padding: "8px 16px",
-                                    cursor: "pointer",
-                                    color: "#666",
-                                    fontSize: "0.9em",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    gap: "6px",
-                                    transition: "border-color 0.2s, color 0.2s",
-                                  }}
-                                  onMouseEnter={(e) => {
-                                    e.currentTarget.style.borderColor = "#888";
-                                    e.currentTarget.style.color = "#333";
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.currentTarget.style.borderColor = "#c0c0c0";
-                                    e.currentTarget.style.color = "#666";
-                                  }}
-                                >
-                                  + Add another language
-                                </button>
-                              )}
-                            </div>
+                                ))}
+                              </div>
+                            </>
                           )}
 
 
@@ -972,8 +869,8 @@ useEffect(() => {
                                     }
                                   >
                                     <option value="">System</option>
-                                    <option value="Computer">Computer</option>
-                                    <option value="Mobile">Mobile</option>
+                                    <option value="opt1">Computer</option>
+                                    <option value="opt2">Mobile</option>
                                   </select>
 
                                   <svg className="select-arrow" width="16" height="16" viewBox="0 0 16 16">
@@ -997,8 +894,8 @@ useEffect(() => {
                                     }
                                   >
                                     <option value="">Mic type</option>
-                                    <option value="Professional mic">Professional mic</option>
-                                    <option value="Normal mic">Normal mic</option>
+                                    <option value="optA">Professional mic</option>
+                                    <option value="optB">Normal mic</option>
                                   </select>
 
                                   <svg className="select-arrow" width="16" height="16" viewBox="0 0 16 16">
@@ -1062,7 +959,7 @@ useEffect(() => {
 
                               <div className="input-container">
                                 <div className="input-wrapper">
-                                  <img src="./password-icon.svg" className="input-icon" />
+                                  <img src="/password-icon.svg" className="input-icon" />
 
                                   <input
                                     type={showSignUpPassword ? "text" : "password"}
@@ -1079,7 +976,7 @@ useEffect(() => {
                                     onClick={() => setShowSignUpPassword((v) => !v)}
                                     className="password-toggle"
                                   >
-                                    <img src="./eye-icon.svg" />
+                                    <img src="/eye-icon.svg" />
                                   </button>
                                 </div>
                               </div>
@@ -1110,7 +1007,7 @@ useEffect(() => {
 
                               <div className="input-container">
                                 <div className="input-wrapper">
-                                  <img src="./password-icon.svg" className="input-icon" />
+                                  <img src="/password-icon.svg" className="input-icon" />
 
                                   <input
                                     type={showSignUpConfirmPassword ? "text" : "password"}
@@ -1127,7 +1024,7 @@ useEffect(() => {
                                     onClick={() => setShowSignUpConfirmPassword((v) => !v)}
                                     className="password-toggle"
                                   >
-                                    <img src="./eye-icon.svg" />
+                                    <img src="/eye-icon.svg" />
                                   </button>
                                 </div>
                               </div>
@@ -1166,58 +1063,20 @@ useEffect(() => {
                             </button>
 
 
-                            {authError && activeTab === "signup" && (
-                              <p className="form-error" style={{ textAlign: "center" }}>{authError}</p>
-                            )}
-
                             <button
                                 type="button"
                                 className="sign-in-button"
-                                disabled={signUpLoading}
-                                style={{ opacity: signUpLoading ? 0.7 : 1 }}
-                                onClick={async () => {
+                                onClick={() => {
                                   const e = validateStep3();
                                   setErrors(e);
-                                  setAuthError("");
+
                                   if (Object.keys(e).length > 0) return;
 
-                                  setSignUpLoading(true);
-                                  try {
-                                    const res = await fetch(`${BACKEND_URL}/api/auth/signup`, {
-                                      method: "POST",
-                                      headers: { "Content-Type": "application/json" },
-                                      body: JSON.stringify({
-                                        firstName: signUpData.firstName,
-                                        lastName: signUpData.lastName,
-                                        email: signUpData.email,
-                                        yearOfBirth: signUpData.yearOfBirth,
-                                        gender: signUpData.gender,
-                                        country: signUpData.country,
-                                        city: signUpData.city,
-                                        education: signUpData.education,
-                                        profession: signUpData.profession,
-                                        languageRelated: signUpData.languageRelated,
-                                        nativeLanguage: signUpData.nativeLanguage,
-                                        languagePairs: signUpData.languagePairs,
-                                        password: signUpData.password,
-                                        system: signUpData.system,
-                                        micType: signUpData.micType,
-                                      }),
-                                    });
-                                    const data = await res.json();
-                                    if (!res.ok) throw new Error(data.detail || "Signup failed");
-
-                                   
-                                    setSignUpCompleted(true);
-                                    navigate("/projects", { replace: true });
-                                  } catch (err: unknown) {
-                                    setAuthError(err instanceof Error ? err.message : "Signup failed");
-                                  } finally {
-                                    setSignUpLoading(false);
-                                  }
+                                  setSignUpCompleted(true);
+                                  navigate("/projects", { replace: true });
                                 }}
                               >
-                                {signUpLoading ? "Creating account..." : "Submit"}
+                                Submit
                               </button>
 
                             </div>

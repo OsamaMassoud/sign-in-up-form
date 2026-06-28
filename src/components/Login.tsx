@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-//import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Login: React.FC = () => {
-  //const { login, register } = useAuth();
+  const { login, register } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isLogin, setIsLogin] = useState(true);
@@ -19,9 +19,9 @@ const Login: React.FC = () => {
     setLoading(true);
     try {
       if (isLogin) {
-        
+        await login(username, password);
       } else {
-        
+        await register(email, username, password);
       }
       const redirectTo = (location.state as any)?.from?.pathname || '/';
       navigate(redirectTo, { replace: true });
