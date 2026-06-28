@@ -309,40 +309,31 @@ useEffect(() => {
 }, [signUpData.country, countryCodeByName]); // يشتغل لما الدولة تتغير أو الـ Map تجهز
 
 
-
 useEffect(() => {
   setLoadingLanguages(true);
-  
-  // 🌟 رابط مباشر ومستقر 100% من مستودع GitHub Raw للغات العالم بصيغة مصفوفة واضحة
-  fetch("https://raw.githubusercontent.com/datasets/language-codes/master/data/language-codes-3letter.json")
-    .then((res) => {
-      if (!res.ok) throw new Error("Failed to fetch languages");
-      return res.json();
-    })
-    .then((data: any[]) => {
-      if (Array.isArray(data)) {
-        // الـ JSON ده يحتوي على مصفوفة كائنات بداخلها حقل English اسم اللغة
-        const languageNames = data
-          .map((item) => item.English)
-          .filter(Boolean)
-          // تنظيف الأسماء لو جينالك نصوص مركبة مثل "Arabic; Maltese" واختيار الاسم الأول
-          .map((name) => String(name).split(";")[0].trim())
-          .sort((a, b) => a.localeCompare(b));
 
-        // إزالة أي تكرار وتحديث الـ State
-        setLanguages(Array.from(new Set(languageNames)));
-      } else {
-        throw new Error("Invalid format");
-      }
-    })
-    .catch((err) => {
-      console.error("Languages Fetch Error:", err);
-      // Fallback (خطة بديلة آمنة) عشان الفورم تفضل شغالة لو النت فصل تماماً
-      setLanguages(["Arabic", "English", "French", "German", "Spanish", "Italian", "Japanese", "Chinese"]);
-    })
-    .finally(() => {
-      setLoadingLanguages(false);
-    });
+  // 🌟 قائمة بأشهر لغات العالم وأكثرها استخداماً في الـ Dataset Collection
+  const worldLanguages = [
+    "Arabic (العربية)",
+    "English",
+    "Spanish (Español)",
+    "French (Français)",
+    "German (Deutsch)",
+    "Mandarin Chinese (中文)",
+    "Hindi (हिन्दी)",
+    "Portuguese (Português)",
+    "Russian (Русский)",
+    "Japanese (日本語)",
+    "Turkish (Türkçe)",
+    "Korean (한국어)",
+    "Italian (Italiano)",
+    "Dutch (Nederlands)",
+    "Persian (فارسي)"
+  ];
+
+  // ترتيب اللغات أبجدياً تلقائياً وتحديث الـ State في أقل من ميلي ثانية
+  setLanguages(worldLanguages.sort((a, b) => a.localeCompare(b)));
+  setLoadingLanguages(false);
 }, []);
                         useEffect(() => {
                           if (activeTab === "signin") {
