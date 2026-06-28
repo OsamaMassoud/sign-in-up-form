@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import "./Auth.css";
 import StepIndicator from "../components/StepIndicator";
 import { useNavigate } from "react-router-dom";
+import countriesData from './countries.json';
+import languagesData from './languages.json';
 
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -219,104 +221,114 @@ function App() {
 
 
 
+/// ==========================================
+// 1. إعداد الدول مباشرة من الملف المستورد في الأعلى
+// ==========================================
+useEffect(() => {
+  setLoadingCountries(true);
+  try {
+    // نستخدم المتغير المستورد مباشرة دون الحاجة لـ fetch
+    const data = countriesData as unknown as RestCountry[]; 
 
-                                useEffect(() => {
-                    setLoadingCountries(true);
+    const names = data
+      .map((c: RestCountry) => c.name.common)
+      .filter((x: string) => Boolean(x))
+      .sort((a: string, b: string) => a.localeCompare(b));
 
-                    fetch("https://restcountries.com/v3.1/all?fields=name,cca2")
-                      .then((res) => res.json() as Promise<RestCountry[]>)
-                      .then((data) => {
-                        const names = data
-                          .map((c: RestCountry) => c.name.common)
-                          .filter((x: string) => Boolean(x))
-                          .sort((a: string, b: string) => a.localeCompare(b));
+    const map: Record<string, string> = {};
+    data.forEach((c: RestCountry) => {
+      if (c?.name?.common && c?.cca2) {
+        map[c.name.common] = c.cca2;
+      }
+    });
 
-                        const map: Record<string, string> = {};
-                        data.forEach((c: RestCountry) => {
-                          if (c?.name?.common && c?.cca2) {
-                            map[c.name.common] = c.cca2;
-                          }
-                        });
-
-                        setCountries(names);
-                        setCountryCodeByName(map);
-                      })
-                      .catch(() => {
-                        setCountries([]);
-                        setCountryCodeByName({});
-                      })
-                      .finally(() => setLoadingCountries(false));
-                  }, []);
-
-
-
-
-                useEffect(() => {
-                  if (!signUpData.country) {
-                    setCities([]);
-                    return;
-                  }
-
-                  const iso2 = countryCodeByName[signUpData.country];
-                  if (!iso2) {
-                    setCities([]);
-                    return;
-                  }
-
-                  const username = import.meta.env.VITE_GEONAMES_USERNAME as string | undefined;
-                  if (!username) {
-                    console.log("Missing GeoNames username");
-                    setCities([]);
-                    return;
-                  }
-
-                  setLoadingCities(true);
-                  setSignUpData(prev => ({ ...prev, city: "" }));
-
-                  const url =
-                    `https://secure.geonames.org/searchJSON?` +
-                    `country=${encodeURIComponent(iso2)}` +
-                    `&featureClass=P` +
-                    `&featureCode=PPLC` +
-                    `&featureCode=PPLA` +
-                    `&featureCode=PPLA2` +
-                    `&orderby=name` +
-                    `&maxRows=30` +
-                    `&username=${username}`;
-
-                  fetch(url)
-                    .then(res => res.json())
-                    .then(data => {
-                      const list = (data.geonames ?? []).map(
-                        (c: { name: string }) => c.name
-                      );
-                      setCities(list);
-                    })
-                    .catch(() => setCities([]))
-                    .finally(() => setLoadingCities(false));
-                }, [signUpData.country, countryCodeByName]);
+    setCountries(names);
+    setCountryCodeByName(map);
+  } catch (err) {
+    console.error("Error processing countries data:", err);
+    setCountries([]);
+    setCountryCodeByName({});
+  } finally {
+    setLoadingCountries(false);
+  }
+}, []); // مصفوفة فارغة لأن البيانات ثابتة محلياً
 
 
+// ==========================================
+// 2. جلب المدن بناءً على الدولة (GeoNames يدعم CORS ولا مشاكل فيه)
+// ==========================================
+useEffect(() => {
+  if (!signUpData.country) {
+    setCities([]);
+    return;
+  }
 
-                          
-                        useEffect(() => {
-                          setLoadingLanguages(true);
+  const iso2 = countryCodeByName[signUpData.country];
+  if (!iso2) {
+    setCities([]);
+    return;
+  }
 
-                          fetch("https://restcountries.com/v3.1/all?fields=languages")
-                            .then((res) => res.json() as Promise<RestCountryLang[]>)
-                            .then((data) => {
-                              const set = new Set<string>();
+  const username = import.meta.env.VITE_GEONAMES_USERNAME as string | undefined;
+  if (!username) {
+    console.log("Missing GeoNames username");
+    setCities([]);
+    return;
+  }
 
-                              data.forEach((c) => {
-                                if (!c.languages) return;
-                                Object.values(c.languages).forEach((lang) => set.add(lang));
-                              });
+  setLoadingCities(true);
+  setSignUpData(prev => ({ ...prev, city: "" }));
 
-                              setLanguages(Array.from(set).sort((a, b) => a.localeCompare(b)));
-                            })
-                            .catch(() => setLanguages([]))
-                            .finally(() => setLoadingLanguages(false));
-                        }, []);
+  const url =
+    `https://secure.geonames.org/searchJSON?` +
+    `country=${encodeURIComponent(iso2)}` +
+    `&featureClass=P` +
+    `&featureCode=PPLC` +
+    `&featureCode=PPLA` +
+    `&featureCode=PPLA2` +
+    `&orderby=name` +
+    `&maxRows=30` +
+    `&username=${username}`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      const list = (data.geonames ?? []).map(
+        (c: { name: string }) => c.name
+      );
+      setCities(list);
+    })
+    .catch((err) => {
+      console.error("Error loading cities:", err);
+      setCities([]);
+    })
+    .finally(() => setLoadingCities(false));
+}, [signUpData.country, countryCodeByName]);
+
+
+// ==========================================
+// 3. إعداد اللغات مباشرة من الملف المستورد في الأعلى
+// ==========================================
+useEffect(() => {
+  setLoadingLanguages(true);
+  try {
+    // نستخدم المتغير المستورد مباشرة دون الحاجة لـ fetch
+    const data = languagesData as unknown as RestCountryLang[];
+    const set = new Set<string>();
+
+    data.forEach((c) => {
+      if (!c.languages) return;
+      Object.values(c.languages).forEach((lang) => set.add(lang));
+    });
+
+    setLanguages(Array.from(set).sort((a, b) => a.localeCompare(b)));
+  } catch (err) {
+    console.error("Error processing languages data:", err);
+    setLanguages([]);
+  } finally {
+    setLoadingLanguages(false);
+  }
+}, []); // مصفوفة فارغة
 
                         useEffect(() => {
                           if (activeTab === "signin") {
@@ -443,7 +455,7 @@ function App() {
                                 onClick={() => setShowPassword(!showPassword)}
                                 className="password-toggle"
                               >
-                                <img src="/eye-icon.svg" alt="" />
+                                <img src="./eye-icon.svg" alt="" />
                               </button>
                             </div>
                           </div>

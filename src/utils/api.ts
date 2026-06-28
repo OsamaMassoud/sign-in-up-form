@@ -1,3 +1,10 @@
+export const API_BASE = import.meta.env.VITE_BACKEND_URL;
+
+export const authHeaders = () => ({
+  "Content-Type": "application/json",
+  Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+});
+
 export type JsonValue = Record<string, any> | string | number | boolean | null | undefined;
 
 export async function fetchJson<T = any>(
