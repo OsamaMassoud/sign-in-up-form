@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import "./Auth.css";
 import StepIndicator from "../components/StepIndicator";
 import { useNavigate } from "react-router-dom";
-import countriesData from './countries.json';
-import languagesData from './languages.json';
 
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -198,7 +196,7 @@ function App() {
           };
 
                 const strength = getPasswordStrength(signUpData.password);
-                const [countryCodeByName, setCountryCodeByName] = useState<Record<string, string>>({});
+                const [ , setCountryCodeByName] = useState<Record<string, string>>({});
 
 
 
@@ -220,115 +218,126 @@ function App() {
 
 
 
-
-/// ==========================================
-// 1. إعداد الدول مباشرة من الملف المستورد في الأعلى
+// ==========================================
+// 1. جلب الدول مباشرة من Live API (RestCountries v3.1)
 // ==========================================
 useEffect(() => {
   setLoadingCountries(true);
-  try {
-    // نستخدم المتغير المستورد مباشرة دون الحاجة لـ fetch
-    const data = countriesData as unknown as RestCountry[]; 
+  
+  // دالة الـ API الجديدة
+  fetch("https://restcountries.com/v3.1/all?fields=name,cca2")
+    .then((res) => {
+      if (!res.ok) throw new Error("Failed to fetch countries");
+      return res.json();
+    })
+    .then((data: RestCountry[]) => {
+      // استخراج الأسماء وترتيبها أبجدياً
+      const names = data
+        .map((c) => c?.name?.common)
+        .filter((x): x is string => Boolean(x))
+        .sort((a, b) => a.localeCompare(b));
 
-    const names = data
-      .map((c: RestCountry) => c.name.common)
-      .filter((x: string) => Boolean(x))
-      .sort((a: string, b: string) => a.localeCompare(b));
+      // بناء خريطة الأكواد عشان جلب المدن (GeoNames) يفضل شغال صح
+      const map: Record<string, string> = {};
+      data.forEach((c) => {
+        if (c?.name?.common && c?.cca2) {
+          map[c.name.common] = c.cca2;
+        }
+      });
 
-    const map: Record<string, string> = {};
-    data.forEach((c: RestCountry) => {
-      if (c?.name?.common && c?.cca2) {
-        map[c.name.common] = c.cca2;
-      }
+      setCountries(names);
+      setCountryCodeByName(map);
+    })
+    .catch((err) => {
+      console.error("Error fetching countries from API:", err);
+      setCountries([]);
+    })
+    .finally(() => {
+      setLoadingCountries(false);
     });
+}, []); 
 
-    setCountries(names);
-    setCountryCodeByName(map);
-  } catch (err) {
-    console.error("Error processing countries data:", err);
-    setCountries([]);
-    setCountryCodeByName({});
-  } finally {
-    setLoadingCountries(false);
-  }
-}, []); // مصفوفة فارغة لأن البيانات ثابتة محلياً
 
 
 // ==========================================
-// 2. جلب المدن بناءً على الدولة (GeoNames يدعم CORS ولا مشاكل فيه)
+// 3. جلب المدن حياً بناءً على الدولة المختارة
 // ==========================================
 useEffect(() => {
+  // 1. إذا لم يقم المستخدم باختيار دولة، نفرغ مصفوفة المدن تماماً
   if (!signUpData.country) {
     setCities([]);
     return;
   }
 
-  const iso2 = countryCodeByName[signUpData.country];
-  if (!iso2) {
-    setCities([]);
-    return;
-  }
-
-  const username = import.meta.env.VITE_GEONAMES_USERNAME as string | undefined;
-  if (!username) {
-    console.log("Missing GeoNames username");
-    setCities([]);
-    return;
-  }
-
   setLoadingCities(true);
-  setSignUpData(prev => ({ ...prev, city: "" }));
 
-  const url =
-    `https://secure.geonames.org/searchJSON?` +
-    `country=${encodeURIComponent(iso2)}` +
-    `&featureClass=P` +
-    `&featureCode=PPLC` +
-    `&featureCode=PPLA` +
-    `&featureCode=PPLA2` +
-    `&orderby=name` +
-    `&maxRows=30` +
-    `&username=${username}`;
-
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      const list = (data.geonames ?? []).map(
-        (c: { name: string }) => c.name
-      );
-      setCities(list);
+  // 2. استدعاء API جلب المدن بناءً على اسم الدولة المختارة
+  fetch("https://countriesnow.space/api/v0.1/countries/cities", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      country: signUpData.country, // يرسل اسم الدولة مثلاً "Egypt"
+    }),
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error("Failed to fetch cities");
+      return res.json();
+    })
+    .then((body) => {
+      // الـ API يعيد المدن في مصفوفة داخل body.data
+      if (body && Array.isArray(body.data)) {
+        // ترتيب المدن أبجدياً وحفظها
+        setCities(body.data.sort((a: string, b: string) => a.localeCompare(b)));
+      } else {
+        setCities([]);
+      }
     })
     .catch((err) => {
-      console.error("Error loading cities:", err);
+      console.error("Error fetching cities from API:", err);
       setCities([]);
     })
-    .finally(() => setLoadingCities(false));
-}, [signUpData.country, countryCodeByName]);
+    .finally(() => {
+      setLoadingCities(false);
+    });
+}, [signUpData.country]); // يعمل الـ Effect فقط عند تغير الدولة المختارة
 
 
 // ==========================================
-// 3. إعداد اللغات مباشرة من الملف المستورد في الأعلى
+// 2. جلب اللغات مباشرة من Live API
 // ==========================================
 useEffect(() => {
   setLoadingLanguages(true);
-  try {
-    // نستخدم المتغير المستورد مباشرة دون الحاجة لـ fetch
-    const data = languagesData as unknown as RestCountryLang[];
-    const set = new Set<string>();
+  
+  // بنجيب الدول اللي فيها حقل اللغات ونستخلصها
+  fetch("https://restcountries.com/v3.1/all?fields=languages")
+    .then((res) => {
+      if (!res.ok) throw new Error("Failed to fetch languages");
+      return res.json();
+    })
+    .then((data: RestCountryLang[]) => {
+      const set = new Set<string>();
 
-    data.forEach((c) => {
-      if (!c.languages) return;
-      Object.values(c.languages).forEach((lang) => set.add(lang));
+      data.forEach((c) => {
+        if (!c.languages) return;
+        // الـ API بيرجع اللغات كـ Object (كود اللغة: اسم اللغة)
+        Object.values(c.languages).forEach((lang) => {
+          if (typeof lang === "string") set.add(lang);
+        });
+      });
+
+      // تحويل الـ Set لمصفوفة وترتيبها
+      setLanguages(Array.from(set).sort((a, b) => a.localeCompare(b)));
+    })
+    .catch((err) => {
+      console.error("Error fetching languages from API:", err);
+      setLanguages([]);
+    })
+    .finally(() => {
+      setLoadingLanguages(false);
     });
-
-    setLanguages(Array.from(set).sort((a, b) => a.localeCompare(b)));
-  } catch (err) {
-    console.error("Error processing languages data:", err);
-    setLanguages([]);
-  } finally {
-    setLoadingLanguages(false);
-  }
-}, []); // مصفوفة فارغة
+}, []);
 
                         useEffect(() => {
                           if (activeTab === "signin") {
